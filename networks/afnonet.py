@@ -172,7 +172,8 @@ class AFNONet(nn.Module):
     def __init__(
             self,
             params,
-            img_size=(720, 1440),
+            #img_size=(720, 1440),
+            img_size=(1024, 1024),
             patch_size=(16, 16),
             in_chans=2,
             out_chans=2,
@@ -244,6 +245,9 @@ class AFNONet(nn.Module):
         return x
 
     def forward(self, x):
+        #print("------------------------")
+        #print(x.shape)
+        #print("------------------------")
         x = self.forward_features(x)
         x = self.head(x)
         x = rearrange(

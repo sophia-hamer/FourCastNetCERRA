@@ -81,11 +81,14 @@ class PeriodicPad2d(nn.Module):
 def reshape_fields(img, inp_or_tar, crop_size_x, crop_size_y,rnd_x, rnd_y, params, y_roll, train, normalize=True, orog=None, add_noise=False):
     #Takes in np array of size (n_history+1, c, h, w) and returns torch tensor of size ((n_channels*(n_history+1), crop_size_x, crop_size_y)
 
+    #print("BBBBBBBBBBB")
+    #print(img.shape)
+
     if len(np.shape(img)) ==3:
       img = np.expand_dims(img, 0)
 
-    
-    img = img[:, :, 0:720] #remove last pixel
+    #img = img[:, :, 0:720] #remove last pixel
+
     n_history = np.shape(img)[0] - 1
     img_shape_x = np.shape(img)[-2]
     img_shape_y = np.shape(img)[-1]
@@ -98,12 +101,16 @@ def reshape_fields(img, inp_or_tar, crop_size_x, crop_size_y,rnd_x, rnd_y, param
     if crop_size_y == None:
         crop_size_y = img_shape_y
 
+    #if len(img.shape)==4:
+        #print(img[0,0,:3,:3])
+
     if normalize:
         if params.normalization == 'minmax':
           raise Exception("minmax not supported. Use zscore")
         elif params.normalization == 'zscore':
           img -=means
           img /=stds
+
 
     if params.add_grid:
         if inp_or_tar == 'inp':

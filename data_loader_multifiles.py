@@ -118,9 +118,10 @@ class GetDataset(Dataset):
         logging.info("Getting file stats from {}".format(self.files_paths[0]))
         self.n_samples_per_year = _f['fields'].shape[0]
         #original image shape (before padding)
-        #self.img_shape_x = _f['fields'].shape[2] -1#just get rid of one of the pixels
-        self.img_shape_x = _f['fields'].shape[2]
+        self.img_shape_x = _f['fields'].shape[2] -1#just get rid of one of the pixels
         self.img_shape_y = _f['fields'].shape[3]
+        print(self.img_shape_x, self.img_shape_y)
+        os._exit(0)
 
     self.n_samples_total = self.n_years * self.n_samples_per_year
     self.files = [None for _ in range(self.n_years)]
@@ -197,7 +198,6 @@ class GetDataset(Dataset):
     else: 
       rnd_x = 0
       rnd_y = 0
-
       
     if self.precip:
       return reshape_fields(self.files[year_idx][inp_local_idx, self.in_channels], 'inp', self.crop_size_x, self.crop_size_y, rnd_x, rnd_y,self.params, y_roll, self.train), \

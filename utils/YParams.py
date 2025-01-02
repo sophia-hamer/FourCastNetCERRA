@@ -7,6 +7,7 @@ class YParams():
     self._yaml_filename = yaml_filename
     self._config_name = config_name
     self.params = {}
+    print_params = True
 
     if print_params:
       print("------------------ Configuration ------------------")

@@ -19,8 +19,8 @@ full_field: &FULL_FIELD
   N_grid_channels: 0
   gridtype: 'sinusoidal' #options 'sinusoidal' or 'linear'
   roll: !!bool False
-  max_epochs: 50
-  batch_size: 64
+  max_epochs: 25
+  batch_size: 4 #64
 
   #afno hyperparams
   num_blocks: 8
@@ -61,22 +61,178 @@ full_field: &FULL_FIELD
 
 afno_backbone: &backbone
   <<: *FULL_FIELD
-  log_to_wandb: !!bool True
+  log_to_wandb: !!bool False
   lr: 5E-4
-  batch_size: 64
-  max_epochs: 150
+  batch_size: 12 #64
+  max_epochs: 150 #150
   scheduler: 'CosineAnnealingLR'
   in_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
   out_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
   orography: !!bool False
   orography_path: None 
-  exp_dir: '/pscratch/sd/s/shas1693/results/era5_wind'
-  train_data_path: '/pscratch/sd/s/shas1693/data/era5/train'
-  valid_data_path: '/pscratch/sd/s/shas1693/data/era5/test'
-  inf_data_path:   '/pscratch/sd/s/shas1693/data/era5/out_of_sample'
-  time_means_path:   '/pscratch/sd/s/shas1693/data/era5/time_means.npy'
-  global_means_path: '/pscratch/sd/s/shas1693/data/era5/global_means.npy'
-  global_stds_path:  '/pscratch/sd/s/shas1693/data/era5/global_stds.npy'
+  #exp_dir: '/pscratch/sd/s/shas1693/results/era5_wind'
+  exp_dir: '/explore/nobackup/people/shamer/weights'
+  #train_data_path: '/pscratch/sd/s/shas1693/data/era5/train'
+  train_data_path: '/explore/nobackup/people/shamer/training/training_CERRA_surface'
+  valid_data_path: '/explore/nobackup/people/shamer/test/test_CERRA_surface'
+  inf_data_path:   '/explore/nobackup/people/shamer/test/test_CERRA_surface'
+  time_means_path:   '/explore/nobackup/people/shamer/old_nobackup/stats_v1/time_means.npy'
+  global_means_path: '/explore/nobackup/people/shamer/stats/stats_CERRA_surface/global_means.npy'
+  global_stds_path:  '/explore/nobackup/people/shamer/stats/stats_CERRA_surface/global_stds.npy'
+  border: '/explore/nobackup/people/shamer/border_data/ERA5_2018_jan_predicted_regridded.nc'
+
+afno_backbone_nvidia: &backbone_nvidia
+  <<: *FULL_FIELD
+  log_to_wandb: !!bool False
+  lr: 5E-4
+  batch_size: 12 #64
+  max_epochs: 150 #150
+  scheduler: 'CosineAnnealingLR'
+  in_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  out_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  orography: !!bool False
+  orography_path: None 
+  #exp_dir: '/pscratch/sd/s/shas1693/results/era5_wind'
+  exp_dir: '/explore/nobackup/people/shamer/weights'
+  #train_data_path: '/pscratch/sd/s/shas1693/data/era5/train'
+  train_data_path: '/explore/nobackup/people/shamer/training/training_nvidia_ERA5'
+  valid_data_path: '/explore/nobackup/people/shamer/valid'
+  inf_data_path:   '/explore/nobackup/people/shamer/test/test_nvidia_ERA5'
+  time_means_path:   '/explore/nobackup/people/shamer/old_nobackup/stats_v0/time_means.npy'
+  global_means_path: '/explore/nobackup/people/shamer/stats/stats_nvidia_ERA5/global_means.npy'
+  global_stds_path:  '/explore/nobackup/people/shamer/stats/stats_nvidia_ERA5/global_stds.npy'
+  border: '/explore/nobackup/people/shamer/border_data/ERA5_2018_jan_predicted_regridded.nc'
+
+afno_backbone_cerra_nosurface_cerra_border: &backbone_cerra_nosurface_cerra_border
+  <<: *FULL_FIELD
+  log_to_wandb: !!bool False
+  lr: 5E-4
+  batch_size: 12 #64
+  max_epochs: 150 #150
+  scheduler: 'CosineAnnealingLR'
+  in_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  out_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  replaced_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  #buffers: [-1, 0, 1, 6, 8, 16, 24, 32, 64, 512]
+  buffers: [-1, 0, 1, 6, 8, 16, 24, 32, 64, 512]
+  orography: !!bool False
+  orography_path: None 
+  #exp_dir: '/pscratch/sd/s/shas1693/results/era5_wind'
+  exp_dir: '/explore/nobackup/people/shamer/weights'
+  out_dir: 'cerra/nointerp'
+  #train_data_path: '/pscratch/sd/s/shas1693/data/era5/train'
+  train_data_path: '/explore/nobackup/people/shamer/training/training_CERRA_nosurface'
+  valid_data_path: '/explore/nobackup/people/shamer/valid'
+  inf_data_path:   '/explore/nobackup/people/shamer/test/test_CERRA_nosurface'
+  time_means_path:   '/explore/nobackup/people/shamer/old_nobackup/stats_v1/time_means.npy'
+  global_means_path: '/explore/nobackup/people/shamer/stats/stats_CERRA_nosurface/global_means.npy'
+  global_stds_path:  '/explore/nobackup/people/shamer/stats/stats_CERRA_nosurface/global_stds.npy'
+  border: '/explore/nobackup/people/shamer/border_data/2018_CERRA_nosurface.h5'
+
+afno_backbone_cerra_nosurface_nvidia_border: &backbone_cerra_nosurface_nvidia_border
+  <<: *FULL_FIELD
+  log_to_wandb: !!bool False
+  lr: 5E-4
+  batch_size: 12 #64
+  max_epochs: 150 #150
+  scheduler: 'CosineAnnealingLR'
+  in_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  out_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  replaced_channels: [1, 2, 4, 5, 6, 8, 9, 10, 13, 14, 16, 17, 18, 19]
+  buffers: [-1, 0, 1, 6, 8, 16, 24, 32, 64, 512]
+  orography: !!bool False
+  orography_path: None 
+  #exp_dir: '/pscratch/sd/s/shas1693/results/era5_wind'
+  exp_dir: '/explore/nobackup/people/shamer/weights'
+  out_dir: 'cerra_nosurface/nointerp'
+  #train_data_path: '/pscratch/sd/s/shas1693/data/era5/train'
+  train_data_path: '/explore/nobackup/people/shamer/training/training_CERRA_nosurface'
+  valid_data_path: '/explore/nobackup/people/shamer/valid'
+  inf_data_path:   '/explore/nobackup/people/shamer/test/test_CERRA_nosurface'
+  time_means_path:   '/explore/nobackup/people/shamer/old_nobackup/stats_v1/time_means.npy'
+  global_means_path: '/explore/nobackup/people/shamer/stats/stats_CERRA_nosurface/global_means.npy'
+  global_stds_path:  '/explore/nobackup/people/shamer/stats/stats_CERRA_nosurface/global_stds.npy'
+  border: '/explore/nobackup/people/shamer/border_data/ERA5_2018_jan_predicted_regridded.nc'
+
+afno_backbone_cerra_nosurface_nvidia_border_only_z: &backbone_cerra_nosurface_nvidia_border_only_z
+  <<: *FULL_FIELD
+  log_to_wandb: !!bool False
+  lr: 5E-4
+  batch_size: 12 #64
+  max_epochs: 150 #150
+  scheduler: 'CosineAnnealingLR'
+  in_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  out_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  replaced_channels: [16, 17, 18, 19]
+  buffers: [-1, 0, 1, 6, 8, 16, 24, 32, 64, 512]
+  orography: !!bool False
+  orography_path: None 
+  #exp_dir: '/pscratch/sd/s/shas1693/results/era5_wind'
+  exp_dir: '/explore/nobackup/people/shamer/weights'
+  out_dir: 'cerra_nosurface_nvidia_border_only_z/nointerp'
+  #train_data_path: '/pscratch/sd/s/shas1693/data/era5/train'
+  train_data_path: '/explore/nobackup/people/shamer/training/training_CERRA_nosurface'
+  valid_data_path: '/explore/nobackup/people/shamer/valid'
+  inf_data_path:   '/explore/nobackup/people/shamer/test/test_CERRA_nosurface'
+  time_means_path:   '/explore/nobackup/people/shamer/old_nobackup/stats_v1/time_means.npy'
+  global_means_path: '/explore/nobackup/people/shamer/stats/stats_CERRA_nosurface/global_means.npy'
+  global_stds_path:  '/explore/nobackup/people/shamer/stats/stats_CERRA_nosurface/global_stds.npy'
+  border: '/explore/nobackup/people/shamer/border_data/ERA5_2018_jan_predicted_regridded.nc'
+
+afno_backbone_cerra_surface_nvidia_border: &backbone_cerra_surface_nvidia_border
+  <<: *FULL_FIELD
+  log_to_wandb: !!bool False
+  lr: 5E-4
+  batch_size: 12 #64
+  max_epochs: 1 #150
+  scheduler: 'CosineAnnealingLR'
+  in_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  out_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  #replaced_channels: [1, 2, 4, 5, 6, 8, 9, 10, 13, 14, 16, 17, 18, 19]
+  replaced_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  buffers: [-1, 0, 1, 6, 8, 16, 24, 32, 64, 512]
+  orography: !!bool False
+  orography_path: None 
+  #exp_dir: '/pscratch/sd/s/shas1693/results/era5_wind'
+  exp_dir: '/explore/nobackup/people/shamer/weights'
+  out_dir: 'cerra_surface/nointerp'
+  #train_data_path: '/pscratch/sd/s/shas1693/data/era5/train'
+  train_data_path: '/explore/nobackup/people/shamer/training/training_CERRA_surface'
+  valid_data_path: '/explore/nobackup/people/shamer/test/test_CERRA_surface'
+  inf_data_path:   '/explore/nobackup/people/shamer/test/test_CERRA_surface'
+  time_means_path:   '/explore/nobackup/people/shamer/old_nobackup/stats_v1/time_means.npy'
+  global_means_path: '/explore/nobackup/people/shamer/stats/stats_CERRA_surface/global_means.npy'
+  global_stds_path:  '/explore/nobackup/people/shamer/stats/stats_CERRA_surface/global_stds.npy'
+  border: '/explore/nobackup/people/shamer/border_data/ERA5_2018_jan_predicted_regridded_nottransformed.nc'
+  #border: '/explore/nobackup/people/shamer/border_data/ERA5_2018_jan_predicted_regridded.nc'
+
+afno_backbone_cerra_surface_cerra_border: &backbone_cerra_surface_cerra_border
+  <<: *FULL_FIELD
+  log_to_wandb: !!bool False
+  lr: 5E-4
+  batch_size: 12 #64
+  max_epochs: 1 #150
+  scheduler: 'CosineAnnealingLR'
+  in_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  out_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  #replaced_channels: [1, 2, 4, 5, 6, 8, 9, 10, 13, 14, 16, 17, 18, 19]
+  replaced_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  buffers: [-1, 0, 1, 6, 8, 16, 24, 32, 64, 512]
+  orography: !!bool False
+  orography_path: None 
+  #exp_dir: '/pscratch/sd/s/shas1693/results/era5_wind'
+  exp_dir: '/explore/nobackup/people/shamer/weights'
+  out_dir: 'cerra_surface_cerra_border/nointerp'
+  #train_data_path: '/pscratch/sd/s/shas1693/data/era5/train'
+  train_data_path: '/explore/nobackup/people/shamer/training/training_CERRA_surface'
+  valid_data_path: '/explore/nobackup/people/shamer/test/test_CERRA_surface'
+  inf_data_path:   '/explore/nobackup/people/shamer/test/test_CERRA_surface'
+  time_means_path:   '/explore/nobackup/people/shamer/old_nobackup/stats_v1/time_means.npy'
+  global_means_path: '/explore/nobackup/people/shamer/stats/stats_CERRA_surface/global_means.npy'
+  global_stds_path:  '/explore/nobackup/people/shamer/stats/stats_CERRA_surface/global_stds.npy'
+  #border: '/explore/nobackup/people/shamer/border_data/ERA5_2018_jan_predicted_regridded_nottransformed.nc'
+  border: '/explore/nobackup/people/shamer/border_data/2018_CERRA_surface.h5'
+  #border: '/explore/nobackup/people/shamer/border_data/ERA5_2018_jan_predicted_regridded.nc'
 
 afno_backbone_orography: &backbone_orography 
   <<: *backbone
@@ -86,9 +242,9 @@ afno_backbone_orography: &backbone_orography
 afno_backbone_finetune: 
   <<: *backbone
   lr: 1E-4
-  batch_size: 64
+  batch_size: 1 #64
   log_to_wandb: !!bool True
-  max_epochs: 50
+  max_epochs: 25
   pretrained: !!bool True
   two_step_training: !!bool True
   pretrained_ckpt_path: '/pscratch/sd/s/shas1693/results/era5_wind/afno_backbone/0/training_checkpoints/best_ckpt.tar'
@@ -96,8 +252,8 @@ afno_backbone_finetune:
 perturbations:
   <<: *backbone
   lr: 1E-4
-  batch_size: 64
-  max_epochs: 50
+  batch_size: 1 #64
+  max_epochs: 25
   pretrained: !!bool True
   two_step_training: !!bool True
   pretrained_ckpt_path: '/pscratch/sd/j/jpathak/ERA5_expts_gtc/wind/afno_20ch_bs_64_lr5em4_blk_8_patch_8_cosine_sched/1/training_checkpoints/best_ckpt.tar'
@@ -106,7 +262,7 @@ perturbations:
   n_perturbations: 100 
   save_channel: !bool True
   save_idx: 4
-  save_raw_forecasts: !!bool False
+  save_raw_forecasts: !!bool True
   date_strings: ["2018-01-01 00:00:00"] 
   inference_file_tag: " "
   valid_data_path: "/pscratch/sd/j/jpathak/ "
@@ -122,7 +278,7 @@ precip: &precip
   nettype_wind: 'afno'
   log_to_wandb: !!bool True
   lr: 2.5E-4
-  batch_size: 64
+  batch_size: 2 #64
   max_epochs: 25
   precip: '/pscratch/sd/p/pharring/ERA5/precip/total_precipitation'
   time_means_path_tp: '/pscratch/sd/p/pharring/ERA5/precip/total_precipitation/time_means.npy'

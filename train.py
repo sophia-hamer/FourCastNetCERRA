@@ -83,6 +83,7 @@ class Trainer():
 
   def __init__(self, params, world_rank):
     
+    params.log_to_wandb = False
     self.params = params
     self.world_rank = world_rank
     self.device = torch.cuda.current_device() if torch.cuda.is_available() else 'cpu'
@@ -95,6 +96,11 @@ class Trainer():
     self.valid_data_loader, self.valid_dataset = get_data_loader(params, params.valid_data_path, dist.is_initialized(), train=False)
     self.loss_obj = LpLoss()
     logging.info('rank %d, data loader initialized'%world_rank)
+
+    #for i, data in enumerate(self.train_data_loader, 0):
+            #print(data)
+            #inp, tar = map(lambda x: x.to(self.device, dtype = torch.float), data)      
+            #print(inp.shape)
 
     params.crop_size_x = self.valid_dataset.crop_size_x
     params.crop_size_y = self.valid_dataset.crop_size_y
@@ -145,7 +151,7 @@ class Trainer():
     if params.log_to_wandb:
       wandb.watch(self.model)
 
-    if params.optimizer_type == 'FusedAdam':
+    if False and params.optimizer_type == 'FusedAdam': ########
       self.optimizer = optimizers.FusedAdam(self.model.parameters(), lr = params.lr)
     else:
       self.optimizer = torch.optim.Adam(self.model.parameters(), lr = params.lr)
@@ -153,11 +159,13 @@ class Trainer():
     if params.enable_amp == True:
       self.gscaler = amp.GradScaler()
 
+    #print(torch.distributed.is_available())
+    #print(dist.is_initialized())
+    self.model = nn.DataParallel(self.model)
     if dist.is_initialized():
       self.model = DistributedDataParallel(self.model,
                                            device_ids=[params.local_rank],
                                            output_device=[params.local_rank],find_unused_parameters=True)
-
     self.iters = 0
     self.startEpoch = 0
     if params.resuming:
@@ -251,7 +259,9 @@ class Trainer():
       self.iters += 1
       # adjust_LR(optimizer, params, iters)
       data_start = time.time()
-      inp, tar = map(lambda x: x.to(self.device, dtype = torch.float), data)      
+      inp, tar = map(lambda x: x.to(self.device, dtype = torch.float), data)
+      #print(inp.shape)
+      #print(inp[0,0,:3,:3])
       if self.params.orography and self.params.two_step_training:
           orog = inp[:,-2:-1] 
 
@@ -391,6 +401,7 @@ class Trainer():
             except:
                 pass
             #save first channel of image
+            #print("SAVING IMAGE")
             if self.params.two_step_training:
                 save_image(torch.cat((gen_step_one[0,0], torch.zeros((self.valid_dataset.img_shape_x, 4)).to(self.device, dtype = torch.float), tar[0,0]), axis = 1), params['experiment_dir'] + "/" + str(i) + "/" + str(self.epoch) + ".png")
             else:
@@ -550,7 +561,7 @@ if __name__ == '__main__':
   world_rank = 0
   local_rank = 0
   if params['world_size'] > 1:
-    dist.init_process_group(backend='nccl',
+    dist.init_process_group(backend='mpi',
                             init_method='env://')
     local_rank = int(os.environ["LOCAL_RANK"])
     args.gpu = local_rank
@@ -560,6 +571,10 @@ if __name__ == '__main__':
 
   torch.cuda.set_device(local_rank)
   torch.backends.cudnn.benchmark = True
+
+  print(torch.cuda.device_count())
+  print(torch.cuda.get_device_name(0))
+  print(torch.cuda.get_device_name(1))
 
   # Set up directory
   expDir = os.path.join(params.exp_dir, args.config, str(args.run_num))
